@@ -1,0 +1,19 @@
+flags: {}
+nix:
+  path:
+  - nixpkgs=/home/tjger/.dotfiles/nixos/nixpkgs
+  packages:
+  - ncurses
+  - git
+  - cabal-install
+  - zlibStatic
+  - binutils
+  - gmp
+  enable: true
+  pure: true
+extra-package-dbs: []
+packages: null
+extra-deps:
+# - brick-0.13
+# - text-zipper-0.9
+resolver: lts-8.0
