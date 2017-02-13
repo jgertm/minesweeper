@@ -7,7 +7,34 @@ module Lib where
 import           ClassyPrelude
 
 import           Control.Monad.Random
+import           Data.IOData
 
+setupGame :: (MonadIO m, MonadRandom m, MonadCatch m) => m (GameCfg, GameState)
+setupGame = do
+  hardness <- retry queryHardness $ \(UnknownInput i) -> sayString $ "Unrecognized input: " <> i
+  field    <- newMineField hardness
+  markings <- newOverlay
+  let cfg = Cfg field
+      st  = State markings (0,0)
+  pure (cfg, st)
+
+queryHardness :: (MonadIO m, MonadThrow m) => m Hardness
+queryHardness = do
+  input <- getLine
+
+  case toLower input of
+    "b" -> pure Balkans
+    "i" -> pure Iraq
+    "k" -> pure Korea
+    _   -> throw $ UnknownInput input
+
+retry :: (MonadCatch m, Exception e) => m a -> (e -> m ()) -> m a
+retry action report = catch action $ \e -> report e >> retry action report
+
+
+data Error = UnknownInput String
+           deriving (Show)
+instance Exception Error
 
 type Location = (Int,Int)
 
@@ -64,3 +91,13 @@ type Overlay = Field Marking
 data Marking = Warning
              | Free
              deriving (Show, Eq)
+
+newOverlay :: (MonadIO m) => m Overlay
+newOverlay = pure $ Field mempty
+
+data GameCfg = Cfg { minefield :: Minefield }
+             deriving (Show)
+
+data GameState = State { overlay  :: Overlay
+                       , position :: Location }
+               deriving (Show)
