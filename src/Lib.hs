@@ -42,6 +42,10 @@ lowest, highest :: Location
 lowest  = (0,0)
 highest = (9,9)
 
+class Renderable r where
+  render   :: r -> String
+  absolute :: r -> Bool
+
 instance (Random l, Bounded l, Random r, Bounded r) => Random (l,r) where
   randomR ((lowL,lowR),(hiL, hiR)) gen = do
     let (randL, gen')  = randomR (lowL, hiL) gen
@@ -57,6 +61,12 @@ instance (Monoid e) => Monoid (Field e) where
   mappend (Field x) (Field y) = Field $ union x y
 instance Functor Field where
   fmap f (Field e) = Field $ fmap f e
+instance (Renderable r) => Renderable (Field r) where
+  render f = unlines . fmap (concatMap snd)
+           . groupBy ((==) `on` (fst . fst))
+           . mapToList . unfield
+           $ fmap render f <> fieldOf " "
+  absolute _ = True
 
 fieldOf :: e -> Field e
 fieldOf e = Field . mapFromList . fmap (\i -> (quotRem i 10, e)) $ [0..99]
@@ -72,6 +82,10 @@ hardnessLevel :: Hardness -> Int
 hardnessLevel Balkans = 10
 hardnessLevel Iraq    = 20
 hardnessLevel Korea   = 30
+
+instance Renderable Mine where
+  render () = "+"
+  absolute _ = False
 
 newMineField :: (MonadRandom m) => Hardness -> m Minefield
 newMineField hardness = do
@@ -91,6 +105,10 @@ type Overlay = Field Marking
 data Marking = Warning
              | Free
              deriving (Show, Eq)
+instance Renderable Marking where
+  render Warning = "!"
+  render Free = " "
+  absolute _ = False
 
 newOverlay :: (MonadIO m) => m Overlay
 newOverlay = pure $ Field mempty
