@@ -7,7 +7,6 @@ module Lib where
 import           ClassyPrelude
 
 import           Control.Monad.Random
-import           Data.Array.IArray
 
 
 type Location = (Int,Int)
@@ -23,10 +22,20 @@ instance (Random l, Bounded l, Random r, Bounded r) => Random (l,r) where
     ((randL,randR), gen'')
   random gen = randomR ((minBound,minBound), (maxBound,maxBound)) gen
 
-data Field e = Field (Array Location e) deriving (Show)
+data Field e = Field { unfield ::  (Map Location e) } deriving (Show)
+instance (Semigroup e) => Semigroup (Field e) where
+  (Field x) <> (Field y) = Field $ union x y
+instance (Monoid e) => Monoid (Field e) where
+  mempty = Field . mapFromList . fmap (\i -> (quotRem i 10, mempty)) $ [0..99]
+  mappend (Field x) (Field y) = Field $ union x y
+instance Functor Field where
+  fmap f (Field e) = Field $ fmap f e
+
+fieldOf :: e -> Field e
+fieldOf e = Field . mapFromList . fmap (\i -> (quotRem i 10, e)) $ [0..99]
 
 type Minefield = Field Mine
-type Mine = Maybe ()
+type Mine = ()
 
 data Hardness = Balkans
               | Iraq
@@ -40,9 +49,8 @@ hardnessLevel Korea   = 30
 newMineField :: (MonadRandom m) => Hardness -> m Minefield
 newMineField hardness = do
   mineLocations <- generateLocations (hardnessLevel hardness) mempty
-  let mineField  = foo mineLocations (\c -> (c, Just ()))
-      clearField = foo [0..99] (\i -> (quotRem i 10,Nothing))
-  pure . Field . array (lowest,highest) . mapToList $ union mineField clearField
+  let mineField  = foo mineLocations (\c -> (c, ()))
+  pure . Field $ mineField
   where foo :: [a] -> (a -> (Location, Mine)) -> Map Location Mine
         foo ls f = mapFromList $ fmap f ls
 
@@ -52,7 +60,7 @@ generateLocations n ls = if length ls == n
   else do
     e <- getRandomR (lowest,highest)
     generateLocations n $ insertSet e ls
-type Overlay = Field (Maybe Marking)
+type Overlay = Field Marking
 data Marking = Warning
              | Free
              deriving (Show, Eq)
