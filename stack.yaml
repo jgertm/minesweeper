@@ -16,4 +16,4 @@ packages: null
 extra-deps:
 # - brick-0.13
 # - text-zipper-0.9
-resolver: lts-8.0
+resolver: lts-8.2

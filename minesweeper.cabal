@@ -16,10 +16,23 @@ extra-source-files:  README.md
 library
   hs-source-dirs:      src
   ghc-options:         -Wall
-  exposed-modules:     Lib
+  default-extensions:  NoImplicitPrelude
+                     , OverloadedStrings
+  exposed-modules:     Minesweeper
+  other-modules:       Minesweeper.Types
+                     , Minesweeper.Keymap
+                     , Minesweeper.Rendering
+                     , Minesweeper.Utils
+                     , Minesweeper.Setup
+                     , Minesweeper.Play
+                     , Minesweeper.Terminate
   build-depends:       base >= 4.7 && < 5
                      , classy-prelude
+                     , bifunctors
+                     , witherable
                      , chunked-data
+                     , mtl
+                     , MonadRandom
   default-language:    Haskell2010
 
 executable minesweeper-exe
