@@ -13,6 +13,7 @@ import           ClassyPrelude
 
 import           Control.Monad.State
 import           Data.Monoid         (Sum (..))
+import           System.Console.ANSI
 
 
 class Renderable r where
@@ -43,7 +44,7 @@ draw = do
   cfg <- ask
   st  <- get
 
-  say mempty
+  liftIO clearScreen
   sayString $ unlines . fmap mconcat . rows . fmap (\loc -> (loc, pixel cfg st loc)) $ allLocations
 
 pixel :: GameCfg -> GameState -> Location -> String
