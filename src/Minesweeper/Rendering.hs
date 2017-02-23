@@ -43,6 +43,7 @@ draw = do
   cfg <- ask
   st  <- get
 
+  say mempty
   sayString $ unlines . fmap mconcat . rows . fmap (\loc -> (loc, pixel cfg st loc)) $ allLocations
 
 pixel :: GameCfg -> GameState -> Location -> String

@@ -31,4 +31,5 @@ getInput km = do
   explain km
   putStr "> "
   input <- getKey
+  say mempty
   retry (interpret km input) $ \(UnknownInput i) -> say $ "Unrecognized input: " <> singleton i
