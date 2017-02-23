@@ -80,7 +80,7 @@ checkContinue = do
 
 moveCursor :: Direction -> Cursor -> Cursor
 moveCursor dir (Cursor loc) = Cursor $ case dir of
-  North -> first succ loc
-  South -> first pred loc
-  West  -> second succ loc
-  East  -> second pred loc
+  North -> first pred loc
+  South -> first succ loc
+  West  -> second pred loc
+  East  -> second succ loc

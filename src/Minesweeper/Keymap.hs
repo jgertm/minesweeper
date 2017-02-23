@@ -38,8 +38,8 @@ naive = Keymap $ mapFromList
 vim = Keymap $ mapFromList
   [ ('k', Move North)
   , ('j', Move South)
-  , ('h', Move East)
-  , ('l', Move West)
+  , ('h', Move West)
+  , ('l', Move East)
   , ('v', Mark)
   , ('i', Dig)
   ]
