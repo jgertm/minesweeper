@@ -7,12 +7,15 @@ import           Minesweeper.Types
 
 import           ClassyPrelude
 
-import           System.IO          (getChar)
+import           System.IO          (getChar, hFlush, stdin, stdout)
 
 
-retry :: (MonadCatch m, Exception e)
+retry :: (MonadCatch m, Exception e, MonadIO m)
       => m a -> (e -> m ()) -> m a
-retry action report = catch action $ \e -> report e >> retry action report
+retry action report = catch action $ \e -> do
+  report e
+  traverse_ (liftIO . hFlush) [stdin,stdout]
+  retry action report
 
 interpret :: (MonadThrow m)
           => Keymap a -> Char -> m a
