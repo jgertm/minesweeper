@@ -79,8 +79,17 @@ checkContinue = do
   pure $ maybe Continue id (gameOver <|> gameSuccess)
 
 moveCursor :: Direction -> Cursor -> Cursor
-moveCursor dir (Cursor loc) = Cursor $ case dir of
-  North -> first pred loc
-  South -> first succ loc
-  West  -> second pred loc
-  East  -> second succ loc
+moveCursor dir (Cursor loc) = Cursor . coerce $
+  case dir of
+    North -> first pred loc
+    South -> first succ loc
+    West  -> second pred loc
+    East  -> second succ loc
+  where coerce = bimap (enforceBounds 0 9) (enforceBounds 0 9)
+
+enforceBounds :: (Ord a)
+              => a -- ^ lower bound
+              -> a -- ^ upper bound
+              -> a -- ^ value possibly outside bounds
+              -> a -- ^ bounded value
+enforceBounds low hi = max low . min hi
