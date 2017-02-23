@@ -1,3 +1,3 @@
 # minesweeper
 
-add description of minesweeper here
+Implementation of the classic game 'minesweeper' in Haskell.
